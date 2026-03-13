@@ -10,6 +10,6 @@ public class OrderStatus {
     UserEntity userEntity;
     UUID id;
     BigDecimal values;
-    ArrayList<ProductEntity> cartProducts;
+    Integer Hashcode;
     LocalDateTime createDate;
 }
