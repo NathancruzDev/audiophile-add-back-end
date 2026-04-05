@@ -1,9 +1,7 @@
 package com.example.back_end.model.entity;
 
 import com.example.back_end.model.dto.UserCreateDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import org.hibernate.query.Order;
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,13 +13,15 @@ import java.util.List;
 @Table(name = "users_entity")
 public class UserEntity implements UserDetails {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
     String name;
-    String emailAdress;
+    String emailAddress;
     String password;
     String phoneNumber;
 
-    String adress;
+    String address;
 
     String zipCode;
     String city;
@@ -29,26 +29,25 @@ public class UserEntity implements UserDetails {
 
     ArrayList<String> paymentMethods;
     ArrayList<OrderStatus>  lastOrders;
-    ArrayList<ProductEntity> cartItens;
 
-
+    @OneToOne(mappedBy = "user")
+    CartEntity cartEntity;
 
     public UserEntity() {
     }
 
-    public UserEntity(Integer id, String name, String emailAdress, String phoneNumber, String adress,String password ,String zipCode, String city, String country, ArrayList<String> paymentMethods, ArrayList<OrderStatus> lastOrders, ArrayList<ProductEntity> cartItens) {
+    public UserEntity(Integer id, String name, String emailAddress, String phoneNumber, String adress, String password , String zipCode, String city, String country, ArrayList<String> paymentMethods, ArrayList<OrderStatus> lastOrders) {
         this.id = id;
         this.name = name;
-        this.emailAdress = emailAdress;
+        this.emailAddress = emailAddress;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.adress = adress;
+        this.address = adress;
         this.zipCode = zipCode;
         this.city = city;
         this.country = country;
         this.paymentMethods = paymentMethods;
         this.lastOrders = lastOrders;
-        this.cartItens = cartItens;
     }
 
     public UserEntity(UserCreateDto userCreateDto) {
@@ -75,12 +74,12 @@ public class UserEntity implements UserDetails {
         this.password = password;
     }
 
-    public String getEmailAdress() {
-        return emailAdress;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
-    public void setEmailAdress(String emailAdress) {
-        this.emailAdress = emailAdress;
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public String getPhoneNumber() {
@@ -91,12 +90,12 @@ public class UserEntity implements UserDetails {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getAdress() {
-        return adress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAdress(String adress) {
-        this.adress = adress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getZipCode() {
@@ -139,12 +138,13 @@ public class UserEntity implements UserDetails {
         this.lastOrders = lastOrders;
     }
 
-    public ArrayList<ProductEntity> getCartItens() {
-        return cartItens;
+
+    public CartEntity getCartEntity() {
+        return cartEntity;
     }
 
-    public void setCartItens(ArrayList<ProductEntity> cartItens) {
-        this.cartItens = cartItens;
+    public void setCartEntity(CartEntity cartEntity) {
+        this.cartEntity = cartEntity;
     }
 
     @Override
@@ -184,4 +184,5 @@ public class UserEntity implements UserDetails {
         //UserDetails.super.isEnabled();
         return true;
     }
+
 }

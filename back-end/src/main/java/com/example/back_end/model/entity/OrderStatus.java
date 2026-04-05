@@ -1,9 +1,12 @@
 package com.example.back_end.model.entity;
 
+import jakarta.persistence.Entity;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
+
 
 public class OrderStatus {
 

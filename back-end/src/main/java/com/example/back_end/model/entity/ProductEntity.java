@@ -1,8 +1,6 @@
 package com.example.back_end.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="product")
@@ -11,12 +9,16 @@ public class ProductEntity {
     @Id
     Integer id;
     String name;
-    Double Price;
+    Double price;
+    @ManyToOne
+    @JoinColumn(name = "cart_entity_id")
+    CartEntity cartEntity;
 
-    public ProductEntity(Integer id, String name, Double price) {
+    public ProductEntity(Integer id, String name, Double price, CartEntity cartEntity) {
         this.id = id;
         this.name = name;
-        Price = price;
+        this.price = price;
+        this.cartEntity=cartEntity;
     }
 
     public ProductEntity() {
@@ -32,11 +34,11 @@ public class ProductEntity {
     }
 
     public Double getPrice() {
-        return Price;
+        return price;
     }
 
     public void setPrice(Double price) {
-        Price = price;
+                this.price = price;
     }
 
     public String getName() {
@@ -45,5 +47,13 @@ public class ProductEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public CartEntity getCartEntity() {
+        return cartEntity;
+    }
+
+    public void setCartEntity(CartEntity cartEntity) {
+        this.cartEntity = cartEntity;
     }
 }
