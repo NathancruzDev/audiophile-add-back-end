@@ -1,12 +1,8 @@
 package com.example.back_end.service;
 
 import com.example.back_end.config.TokenConfig;
-import com.example.back_end.exceptions.CartNullException;
 import com.example.back_end.model.dto.*;
-import com.example.back_end.model.entity.CartEntity;
-import com.example.back_end.model.entity.ProductEntity;
 import com.example.back_end.model.entity.UserEntity;
-import com.example.back_end.repository.CartRepository;
 import com.example.back_end.repository.ProductRepository;
 import com.example.back_end.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -16,21 +12,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class UserService {
     private UserRepository userRepository;
     private AuthenticationManager authenticationManager;
     private TokenConfig tokenConfig;
-    CartRepository cartRepository;
     ProductRepository productRepository;
 
+    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository) {
+        this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.tokenConfig = tokenConfig;
+        this.productRepository = productRepository;
+    }
+
     @Transactional
-    public ResponseEntity<UserCreateDto> createUser(@Valid @RequestBody UserCreateDto userCreateDto){
+    public ResponseEntity<UserCreateDto> createUser(@Valid UserCreateDto userCreateDto){
         if(userRepository.existsByEmailAdress(userCreateDto.emailAdress())){
             throw new RuntimeException("The user_id have exist");
         }
@@ -50,44 +51,32 @@ public class UserService {
                 )
         ).collect(Collectors.toList());
     }
-    public ResponseEntity<UserLoginDto> login(@Valid @RequestBody UserLoginDto userLogin) {
+
+    @Transactional
+    public ResponseEntity<UserLoginDto> login( UserLoginDto userLogin) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(userLogin.emailAdress(), userLogin.password());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         UserEntity user = (UserEntity) authentication.getPrincipal();
         String tokenJWT = tokenConfig.generateToken(user);
         return ResponseEntity.ok(new UserLoginDto(user.getEmailAddress(), tokenJWT));
     }
+
     @Transactional
-    public void addItem(ProductEntity product,Integer id){
-        UserEntity user=userRepository.findById(id).orElseThrow(()-> new RuntimeException("This user not exists"));
-        CartEntity cartEntity=user.getCartEntity();
-            if(cartEntity == null){
-                cartEntity=new CartEntity();
-                cartEntity.setUser(user);
+    public void updateUser(UserUpdateDto userUpdateDto){
+        UserEntity userEntity=userRepository.findByEmailAdress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
+            if(!userEntity.getEmailAddress().equals(userUpdateDto.emailAdress())){
+                //troca de email tem que ser tratada mais séria.
+                throw new RuntimeException("");
             }
-        ProductEntity productEntity= (ProductEntity) productRepository.findById(product.getId()).orElseThrow(() -> new RuntimeException("This product not exists."));
-        cartEntity.addItem(productEntity);
-        cartRepository.save(cartEntity);
 
-    }
+        userEntity.setName(userUpdateDto.name());
+        userEntity.setPhoneNumber(userUpdateDto.phoneNumber());
+        userEntity.setAddress(userUpdateDto.adress());
+        userEntity.setZipCode(userUpdateDto.zipCode());
+        userEntity.setCity(userUpdateDto.City());
+        userEntity.setCountry(userUpdateDto.Country());
 
-    @Transactional
-    public List<ProductEntity> getCart(Integer userId){
-        UserEntity user=userRepository.findById(userId).orElseThrow(()-> new RuntimeException("This user does not exist."));
-        CartEntity cartEntity=cartRepository.findByUser(user).orElseThrow(()-> new CartNullException("This cart is null"));
-        return cartEntity.getProducts();
-    }
-
-    //fazer o cleanCart e fazer o retirar unico item do carrinho
-
-    @Transactional
-    public void removeItem(ProductEntity product, Integer id){
-        UserEntity userEntity=userRepository.findById(id).orElseThrow(() -> new RuntimeException("This user dont exist."));
-        CartEntity cartEntity=cartRepository.findByUser(userEntity).orElseThrow(() -> new RuntimeException("This cart is null"));
-        cartEntity.removeItem(product);
-        cartRepository.save(cartEntity);
         userRepository.save(userEntity);
-
     }
 
 

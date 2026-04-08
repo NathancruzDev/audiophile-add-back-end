@@ -1,5 +1,6 @@
 package com.example.back_end.model.entity;
 
+import com.example.back_end.model.dto.ProductDto;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,19 +11,20 @@ public class ProductEntity {
     Integer id;
     String name;
     Double price;
-    @ManyToOne
-    @JoinColumn(name = "cart_entity_id")
-    CartEntity cartEntity;
+    Integer stock;
 
-    public ProductEntity(Integer id, String name, Double price, CartEntity cartEntity) {
+    public ProductEntity(Integer id, String name, Double price, Integer stock) {
         this.id = id;
         this.name = name;
         this.price = price;
-        this.cartEntity=cartEntity;
+        this.stock = stock;
     }
 
     public ProductEntity() {
 
+    }
+
+    public ProductEntity(String name, Double price, Integer stock) {
     }
 
     public Integer getId() {
@@ -49,11 +51,11 @@ public class ProductEntity {
         this.name = name;
     }
 
-    public CartEntity getCartEntity() {
-        return cartEntity;
+    public Integer getStock() {
+        return stock;
     }
 
-    public void setCartEntity(CartEntity cartEntity) {
-        this.cartEntity = cartEntity;
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }

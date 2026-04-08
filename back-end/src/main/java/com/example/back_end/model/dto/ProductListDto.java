@@ -1,6 +1,7 @@
 package com.example.back_end.model.dto;
 
-public record ProductDto(
+public record ProductListDto(
+        Integer id,
         String name,
         Double price,
         Integer stock

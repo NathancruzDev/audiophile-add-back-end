@@ -30,9 +30,6 @@ public class UserEntity implements UserDetails {
     ArrayList<String> paymentMethods;
     ArrayList<OrderStatus>  lastOrders;
 
-    @OneToOne(mappedBy = "user")
-    CartEntity cartEntity;
-
     public UserEntity() {
     }
 
@@ -138,14 +135,6 @@ public class UserEntity implements UserDetails {
         this.lastOrders = lastOrders;
     }
 
-
-    public CartEntity getCartEntity() {
-        return cartEntity;
-    }
-
-    public void setCartEntity(CartEntity cartEntity) {
-        this.cartEntity = cartEntity;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
