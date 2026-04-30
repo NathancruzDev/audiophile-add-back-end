@@ -1,6 +1,5 @@
 package com.example.back_end.model.entity;
 
-import com.example.back_end.model.dto.ProductDto;
 import jakarta.persistence.*;
 
 @Entity

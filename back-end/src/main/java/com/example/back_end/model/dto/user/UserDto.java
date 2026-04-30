@@ -1,4 +1,4 @@
-package com.example.back_end.model.dto;
+package com.example.back_end.model.dto.user;
 
 import com.example.back_end.model.entity.OrderStatus;
 import com.example.back_end.model.entity.ProductEntity;

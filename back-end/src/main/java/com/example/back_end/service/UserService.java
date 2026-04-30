@@ -1,7 +1,8 @@
 package com.example.back_end.service;
 
-import com.example.back_end.config.TokenConfig;
-import com.example.back_end.model.dto.*;
+import com.example.back_end.config.security.TokenConfig;
+import com.example.back_end.model.dto.OrderPendingDto;
+import com.example.back_end.model.dto.user.*;
 import com.example.back_end.model.entity.UserEntity;
 import com.example.back_end.repository.ProductRepository;
 import com.example.back_end.repository.UserRepository;
@@ -21,13 +22,16 @@ public class UserService {
     private UserRepository userRepository;
     private AuthenticationManager authenticationManager;
     private TokenConfig tokenConfig;
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
-    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository) {
+    private PurchasedService purchasedService;
+
+    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PurchasedService purchasedService) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.tokenConfig = tokenConfig;
         this.productRepository = productRepository;
+        this.purchasedService = purchasedService;
     }
 
     @Transactional
@@ -53,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<UserLoginDto> login( UserLoginDto userLogin) {
+    public ResponseEntity<UserLoginDto> login(UserLoginDto userLogin) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(userLogin.emailAdress(), userLogin.password());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         UserEntity user = (UserEntity) authentication.getPrincipal();
@@ -77,6 +81,13 @@ public class UserService {
         userEntity.setCountry(userUpdateDto.Country());
 
         userRepository.save(userEntity);
+    }
+
+    @Transactional
+    public ResponseEntity<List<OrderPendingDto>> getUserRequests(UserDto userDto){
+        UserEntity userEntity=userRepository.findById(userDto.id()).orElseThrow(()-> new RuntimeException("This user dont exists."));
+        List<OrderPendingDto> list=purchasedService.listAllByUser(userDto.id());
+        return ResponseEntity.ok().body(list);
     }
 
 

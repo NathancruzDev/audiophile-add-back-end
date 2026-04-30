@@ -1,6 +1,6 @@
 package com.example.back_end.model.entity;
 
-import com.example.back_end.model.dto.UserCreateDto;
+import com.example.back_end.model.dto.user.UserCreateDto;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,4 +1,4 @@
-package com.example.back_end.config;
+package com.example.back_end.config.security;
 
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;

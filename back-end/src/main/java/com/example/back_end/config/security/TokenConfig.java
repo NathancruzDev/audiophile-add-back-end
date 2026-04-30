@@ -1,4 +1,4 @@
-package com.example.back_end.config;
+package com.example.back_end.config.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

@@ -1,9 +1,7 @@
 package com.example.back_end.controller;
 
-import com.example.back_end.model.dto.GetUsersDto;
-import com.example.back_end.model.dto.UserCreateDto;
-import com.example.back_end.model.dto.UserLoginDto;
-import com.example.back_end.model.dto.UserUpdateDto;
+import com.example.back_end.model.dto.OrderPendingDto;
+import com.example.back_end.model.dto.user.*;
 import com.example.back_end.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +28,7 @@ public class UserController {
         return userService.createUser(userCreateDto);
     }
 
-    @GetMapping
+    @GetMapping("getAllUsers")
     public ResponseEntity<List<GetUsersDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -45,4 +43,10 @@ public class UserController {
     public ResponseEntity<UserLoginDto> login(@Valid @RequestBody UserLoginDto userLoginDto) {
         return userService.login(userLoginDto);
     }
+
+    @GetMapping
+    public ResponseEntity<List<OrderPendingDto>> getRequests(UserDto userDto){
+        return userService.getUserRequests(userDto);
+    }
+
 }

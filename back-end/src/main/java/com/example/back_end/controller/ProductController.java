@@ -1,7 +1,7 @@
 package com.example.back_end.controller;
 
-import com.example.back_end.model.dto.ProductDto;
-import com.example.back_end.model.dto.ProductListDto;
+import com.example.back_end.model.dto.product.ProductDto;
+import com.example.back_end.model.dto.product.ProductListDto;
 import com.example.back_end.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

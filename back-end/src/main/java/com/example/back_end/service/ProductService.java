@@ -1,7 +1,7 @@
 package com.example.back_end.service;
 
-import com.example.back_end.model.dto.ProductDto;
-import com.example.back_end.model.dto.ProductListDto;
+import com.example.back_end.model.dto.product.ProductDto;
+import com.example.back_end.model.dto.product.ProductListDto;
 import com.example.back_end.model.entity.ProductEntity;
 import com.example.back_end.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;

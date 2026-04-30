@@ -1,4 +1,4 @@
-package com.example.back_end.model.dto;
+package com.example.back_end.model.dto.user;
 
 import jakarta.validation.constraints.NotNull;
 

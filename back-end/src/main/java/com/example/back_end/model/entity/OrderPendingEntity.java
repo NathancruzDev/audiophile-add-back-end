@@ -1,39 +1,27 @@
 package com.example.back_end.model.entity;
 
 import com.example.back_end.model.entity.FormPayment;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "purchased")
-public class PurchasedEntity {
+public class OrderPendingEntity {
 
-    Integer id;
     Integer user_id;
+    Integer purchased_id;
     String purchasedHashCode;
     Double momentValue;
-    Date createAt;
+    LocalDateTime createAt;
     FormPayment formPayment;
-    Boolean aproved;
+    StateStatus stateStatus;
 
-    public PurchasedEntity(Integer id, Integer user_id, String purchasedHashCode, Double momentValue, Date createAt, FormPayment formPayment,Boolean aproved) {
-        this.id = id;
+    public OrderPendingEntity(Integer user_id, Integer purchased_id, String purchasedHashCode, Double momentValue, LocalDateTime createAt, FormPayment formPayment, StateStatus stateStatus) {
         this.user_id = user_id;
+        this.purchased_id = purchased_id;
         this.purchasedHashCode = purchasedHashCode;
         this.momentValue = momentValue;
         this.createAt = createAt;
         this.formPayment = formPayment;
-        this.aproved = aproved;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+        this.stateStatus = stateStatus;
     }
 
     public Integer getUser_id() {
@@ -42,6 +30,14 @@ public class PurchasedEntity {
 
     public void setUser_id(Integer user_id) {
         this.user_id = user_id;
+    }
+
+    public Integer getPurchased_id() {
+        return purchased_id;
+    }
+
+    public void setPurchased_id(Integer purchased_id) {
+        this.purchased_id = purchased_id;
     }
 
     public String getPurchasedHashCode() {
@@ -60,11 +56,11 @@ public class PurchasedEntity {
         this.momentValue = momentValue;
     }
 
-    public Date getCreateAt() {
+    public LocalDateTime getCreateAt() {
         return createAt;
     }
 
-    public void setCreateAt(Date createAt) {
+    public void setCreateAt(LocalDateTime createAt) {
         this.createAt = createAt;
     }
 
@@ -76,14 +72,11 @@ public class PurchasedEntity {
         this.formPayment = formPayment;
     }
 
-    public Boolean getAproved() {
-        return aproved;
+    public StateStatus getStatus() {
+        return stateStatus;
     }
 
-    public void setAproved(Boolean aproved) {
-        this.aproved = aproved;
+    public void setStatus(StateStatus stateStatus) {
+        this.stateStatus = stateStatus;
     }
-
-    //acabar essa entidade, criar um servico para manipular as compras e gerar as tabelas de compras, e criar uma interface por enquanto intermediaria de pagamentos, para
-    //depois fazer a implementacao do sistema de pagamento
 }

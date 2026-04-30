@@ -1,15 +1,18 @@
 package com.example.back_end.service;
 
+import org.springframework.stereotype.Service;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+@Service
 public class OrderHashCodeService {
     Random generateRandom=new Random();
 
-        Integer codeGeneration(){
+        public Integer codeGeneration(){
             ArrayList<String> hash = new ArrayList<>();
             Integer n;
             for(int i=0;i <= 3; i++){

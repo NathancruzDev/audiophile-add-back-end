@@ -1,4 +1,4 @@
-package com.example.back_end.config;
+package com.example.back_end.config.security;
 
 import com.example.back_end.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
