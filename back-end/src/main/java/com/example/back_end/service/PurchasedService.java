@@ -2,8 +2,8 @@ package com.example.back_end.service;
 
 import com.example.back_end.model.dto.OrderPendingDto;
 import com.example.back_end.model.dto.product.ProductPurchasedDto;
-import com.example.back_end.model.dto.user.UserDto;
-import com.example.back_end.model.dto.payment.CheckoutResponseDto;
+import com.example.back_end.model.dto.user.GetUsersDto;
+import com.example.back_end.model.dto.CheckoutResponseDto;
 import com.example.back_end.model.entity.*;
 import com.example.back_end.repository.OrderPendingRepository;
 import com.example.back_end.repository.ProductRepository;
@@ -48,9 +48,9 @@ public class PurchasedService {
     }
 
     @Transactional
-    public CheckoutResponseDto checkoutQuantity(
+    public CheckoutResponseDto checkout(
             List<ProductPurchasedDto> productsInCart,
-            UserDto userDto,
+             GetUsersDto userDto,
             FormPayment formPayment
     ) {
         List<ProductPurchasedDto> expandedCart = validateAndExpandCart(productsInCart);
@@ -107,9 +107,9 @@ public class PurchasedService {
 
             for (int i = 0; i < product.quantity(); i++) {
                 expandedCart.add(new ProductPurchasedDto(
-                        product.id(),
-                        product.name(),
-                        product.price(),
+                        productEntity.getId(),
+                        productEntity.getName(),
+                        productEntity.getPrice(),
                         1
                 ));
             }
@@ -145,12 +145,13 @@ public class PurchasedService {
 
     private Long calculateAmountInCents(List<ProductPurchasedDto> expandedCart) {
         BigDecimal total = expandedCart.stream()
-                .map(ProductPurchasedDto::price)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(p -> BigDecimal.valueOf(p.price()))
+                .reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
 
         return total
                 .multiply(BigDecimal.valueOf(100))
-                .longValue();
+                .setScale(0)
+                .longValueExact();
     }
 
     @Transactional
@@ -173,7 +174,7 @@ public class PurchasedService {
 
     private void updateStockFromOrders(List<OrderPendingEntity> orders) {
         for (OrderPendingEntity order : orders) {
-            ProductEntity product = productRepository.findById(order.getProduct_id())
+            ProductEntity product = productRepository.findById(order.getPurchasedId())
                     .orElseThrow(() -> new RuntimeException("Product not found while updating stock."));
 
             int newStock = product.getStock() - 1;
@@ -201,11 +202,11 @@ public class PurchasedService {
 
     @Transactional
     public List<OrderPendingDto> listAllByUser(Integer userId) {
-        return purchasedRepository.findByUser_id(userId)
+        return purchasedRepository.findByUserId(userId)
                 .stream()
                 .map(item -> new OrderPendingDto(
                         item.getId(),
-                        item.getUser_id(),
+                        item.getUserId(),
                         item.getPurchasedHashCode(),
                         item.getMomentValue(),
                         item.getCreateAt(),
@@ -229,4 +230,6 @@ public class PurchasedService {
 
         return ResponseEntity.ok().body(orderPendingEntity);
     }
+
+
 }

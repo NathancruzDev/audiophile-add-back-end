@@ -2,6 +2,7 @@ package com.example.back_end.model.entity;
 
 import com.example.back_end.model.entity.FormPayment;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.util.Date;
@@ -10,17 +11,18 @@ import java.util.Date;
 @Table(name = "purchased")
 public class PurchasedEntity {
 
+    @Id
     Integer id;
-    Integer user_id;
+    Integer userId;
     String purchasedHashCode;
     Double momentValue;
     Date createAt;
     FormPayment formPayment;
     Boolean aproved;
 
-    public PurchasedEntity(Integer id, Integer user_id, String purchasedHashCode, Double momentValue, Date createAt, FormPayment formPayment,Boolean aproved) {
+    public PurchasedEntity(Integer id, Integer userId, String purchasedHashCode, Double momentValue, Date createAt, FormPayment formPayment,Boolean aproved) {
         this.id = id;
-        this.user_id = user_id;
+        this.userId = userId;
         this.purchasedHashCode = purchasedHashCode;
         this.momentValue = momentValue;
         this.createAt = createAt;
@@ -36,12 +38,12 @@ public class PurchasedEntity {
         this.id = id;
     }
 
-    public Integer getUser_id() {
-        return user_id;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUser_id(Integer user_id) {
-        this.user_id = user_id;
+    public void setUserIdd(Integer userId) {
+        this.userId = userId;
     }
 
     public String getPurchasedHashCode() {
@@ -84,6 +86,4 @@ public class PurchasedEntity {
         this.aproved = aproved;
     }
 
-    //acabar essa entidade, criar um servico para manipular as compras e gerar as tabelas de compras, e criar uma interface por enquanto intermediaria de pagamentos, para
-    //depois fazer a implementacao do sistema de pagamento
 }

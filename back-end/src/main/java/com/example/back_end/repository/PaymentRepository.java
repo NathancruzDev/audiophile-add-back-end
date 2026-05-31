@@ -11,5 +11,5 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity,Long> {
 
     Optional<PaymentEntity> findByStripePaymentIntentId(String stripePaymentIntentId);
 
-    Optional<PaymentEntity> findByOrderHash(String orderHash);
+    Optional<PaymentEntity> findByHashCode(String HashCode);
 }

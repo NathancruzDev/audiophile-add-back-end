@@ -3,6 +3,7 @@ package com.example.back_end.model.entity;
 import com.example.back_end.model.dto.user.UserCreateDto;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
@@ -15,39 +16,50 @@ public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Integer id;
-    String name;
-    String emailAddress;
-    String password;
-    String phoneNumber;
+    private Integer id;
 
-    String address;
+    private String name;
+    private String emailAddress;
+    private String password;
+    private String phoneNumber;
 
-    String zipCode;
-    String city;
-    String country;
+    private String address;
+    private String zipCode;
+    private String city;
+    private String country;
 
-    ArrayList<String> paymentMethods;
-    ArrayList<OrderStatus>  lastOrders;
+    private ArrayList<String> paymentMethods;
+    private ArrayList<OrderStatus> lastOrders;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     public UserEntity() {
     }
 
-    public UserEntity(Integer id, String name, String emailAddress, String phoneNumber, String adress, String password , String zipCode, String city, String country, ArrayList<String> paymentMethods, ArrayList<OrderStatus> lastOrders) {
+    public UserEntity(Integer id, String name, String emailAddress, String phoneNumber, String address, String password , String zipCode, String city, String country, ArrayList<String> paymentMethods, ArrayList<OrderStatus> lastOrders, UserRole role) {
         this.id = id;
         this.name = name;
         this.emailAddress = emailAddress;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.address = adress;
+        this.address = address;
         this.zipCode = zipCode;
         this.city = city;
         this.country = country;
         this.paymentMethods = paymentMethods;
         this.lastOrders = lastOrders;
+        this.role = role;
     }
 
     public UserEntity(UserCreateDto userCreateDto) {
+        // Mapeie os outros campos do seu DTO aqui, por exemplo:
+        // this.name = userCreateDto.name();
+        // this.emailAddress = userCreateDto.emailAdress();
+        // this.password = userCreateDto.password(); // Lembre-se de encodar a senha no service depois!
+
+        // Define que todo mundo nasce como USER
+        this.role = UserRole.USER;
     }
 
     public Integer getId() {
@@ -65,7 +77,6 @@ public class UserEntity implements UserDetails {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public void setPassword(String password) {
         this.password = password;
@@ -135,10 +146,20 @@ public class UserEntity implements UserDetails {
         this.lastOrders = lastOrders;
     }
 
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        if (this.role == null) {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     }
 
     public String getPassword() {
@@ -147,31 +168,26 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return emailAddress; // Retornando o email como username para o Spring Security
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        //UserDetails.super.isAccountNonExpired()
         return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        //UserDetails.super.isAccountNonLocked()
         return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        //UserDetails.super.isAccountNonExpired()
         return true;
     }
 
     @Override
     public boolean isEnabled() {
-        //UserDetails.super.isEnabled();
         return true;
     }
-
 }

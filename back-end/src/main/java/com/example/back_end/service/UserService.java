@@ -36,7 +36,7 @@ public class UserService {
 
     @Transactional
     public ResponseEntity<UserCreateDto> createUser(@Valid UserCreateDto userCreateDto){
-        if(userRepository.existsByEmailAdress(userCreateDto.emailAdress())){
+        if(userRepository.existsByEmailAddress(userCreateDto.emailAdress())){
             throw new RuntimeException("The user_id have exist");
         }
         UserEntity userEntity=new UserEntity(userCreateDto);
@@ -67,7 +67,7 @@ public class UserService {
 
     @Transactional
     public void updateUser(UserUpdateDto userUpdateDto){
-        UserEntity userEntity=userRepository.findByEmailAdress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
+        UserEntity userEntity=userRepository.findByEmailAddress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
             if(!userEntity.getEmailAddress().equals(userUpdateDto.emailAdress())){
                 //troca de email tem que ser tratada mais séria.
                 throw new RuntimeException("");
@@ -90,5 +90,10 @@ public class UserService {
         return ResponseEntity.ok().body(list);
     }
 
+    @Transactional
+    public ResponseEntity<List<OrderPendingDto>> getMyUserRequests(UserEntity loggedUser){
+        List<OrderPendingDto> list = purchasedService.listAllByUser(loggedUser.getId());
+        return ResponseEntity.ok().body(list);
+    }
 
 }

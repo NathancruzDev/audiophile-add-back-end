@@ -22,10 +22,26 @@ public class PaymentEntity {
 
     private String currency;
 
+    private String hashCode;
+
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum status;
 
     private LocalDateTime createdAt;
+
+    public PaymentEntity() {
+    }
+
+    public PaymentEntity(Long id, Long orderId, String stripePaymentIntentId, Long amountInCents, String currency, String hashCode, OrderStatusEnum status, LocalDateTime createdAt) {
+        this.id = id;
+        this.orderId = orderId;
+        this.stripePaymentIntentId = stripePaymentIntentId;
+        this.amountInCents = amountInCents;
+        this.currency = currency;
+        this.hashCode = hashCode;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
 
     public Long getId() {
         return id;
@@ -67,6 +83,14 @@ public class PaymentEntity {
         this.currency = currency;
     }
 
+    public String getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(String hashCode) {
+        this.hashCode = hashCode;
+    }
+
     public OrderStatusEnum getStatus() {
         return status;
     }
@@ -82,5 +106,6 @@ public class PaymentEntity {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
 
 }

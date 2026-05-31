@@ -7,5 +7,5 @@ import java.util.Arrays;
 import java.util.List;
 
 public interface PurchasedRepository extends JpaRepository<PurchasedEntity,Integer> {
-    List<PurchasedEntity> findByUser_id(Integer userId);
+    List<PurchasedEntity> findByUserId(Integer userId);
 }

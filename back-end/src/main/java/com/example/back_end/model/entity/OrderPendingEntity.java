@@ -1,22 +1,33 @@
 package com.example.back_end.model.entity;
 
 import com.example.back_end.model.entity.FormPayment;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "order_pending")
 public class OrderPendingEntity {
 
-    Integer user_id;
-    Integer purchased_id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Integer id;
+    Integer userId;
+    Integer purchasedId;
     String purchasedHashCode;
     Double momentValue;
     LocalDateTime createAt;
     FormPayment formPayment;
     StateStatus stateStatus;
 
-    public OrderPendingEntity(Integer user_id, Integer purchased_id, String purchasedHashCode, Double momentValue, LocalDateTime createAt, FormPayment formPayment, StateStatus stateStatus) {
-        this.user_id = user_id;
-        this.purchased_id = purchased_id;
+
+    public OrderPendingEntity() {
+    }
+
+    public OrderPendingEntity(Integer id, Integer userId, Integer purchasedId, String purchasedHashCode, Double momentValue, LocalDateTime createAt, FormPayment formPayment, StateStatus stateStatus) {
+        this.id=id;
+        this.userId= userId;
+        this.purchasedId = purchasedId;
         this.purchasedHashCode = purchasedHashCode;
         this.momentValue = momentValue;
         this.createAt = createAt;
@@ -24,20 +35,46 @@ public class OrderPendingEntity {
         this.stateStatus = stateStatus;
     }
 
-    public Integer getUser_id() {
-        return user_id;
+    public OrderPendingEntity(Integer userId, Integer purchasedId, String purchasedHashCode, Double momentValue, LocalDateTime createAt, FormPayment formPayment, StateStatus stateStatus) {
+        this.userId = userId;
+        this.purchasedId = purchasedId;
+        this.purchasedHashCode = purchasedHashCode;
+        this.momentValue = momentValue;
+        this.createAt = createAt;
+        this.formPayment = formPayment;
+        this.stateStatus = stateStatus;
     }
 
-    public void setUser_id(Integer user_id) {
-        this.user_id = user_id;
+    public Integer getId() {
+        return id;
     }
 
-    public Integer getPurchased_id() {
-        return purchased_id;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setPurchased_id(Integer purchased_id) {
-        this.purchased_id = purchased_id;
+    public StateStatus getStateStatus() {
+        return stateStatus;
+    }
+
+    public void setStateStatus(StateStatus stateStatus) {
+        this.stateStatus = stateStatus;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer user_id) {
+        this.userId = userId;
+    }
+
+    public Integer getPurchasedId() {
+        return purchasedId;
+    }
+
+    public void setPurchasedId(Integer purchasedId) {
+        this.purchasedId = purchasedId;
     }
 
     public String getPurchasedHashCode() {
