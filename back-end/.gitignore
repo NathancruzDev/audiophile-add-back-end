@@ -19,9 +19,6 @@ target/
 *.iml
 *.ipr
 
-# Ignorar application.properties
-application.properties
-src/main/resources/*.properties
 
 ### NetBeans ###
 /nbproject/private/
