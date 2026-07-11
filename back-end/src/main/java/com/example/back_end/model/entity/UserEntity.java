@@ -11,15 +11,18 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "users_entity")
+@Table(name = "tb_users")
 public class UserEntity implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;
+
+    @Column(unique = true)
     private String emailAddress;
+
     private String password;
     private String phoneNumber;
 
@@ -28,16 +31,33 @@ public class UserEntity implements UserDetails {
     private String city;
     private String country;
 
-    private ArrayList<String> paymentMethods;
-    private ArrayList<OrderStatus> lastOrders;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_payment_methods",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "payment_method")
+    private List<String> paymentMethods = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "USER_LAST_ORDERS",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "order_status")
+    @Enumerated(EnumType.STRING)
+    private List<OrderStatusEnum> lastOrders = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @Column(name = "user_role")
+    private UserRole user_role;
+
 
     public UserEntity() {
     }
 
-    public UserEntity(Integer id, String name, String emailAddress, String phoneNumber, String address, String password , String zipCode, String city, String country, ArrayList<String> paymentMethods, ArrayList<OrderStatus> lastOrders, UserRole role) {
+    // Construtor completo
+    public UserEntity(Integer id, String name, String emailAddress, String phoneNumber, String address, String password, String zipCode, String city, String country, List<String> paymentMethods, List<OrderStatusEnum> lastOrders, UserRole role) {
         this.id = id;
         this.name = name;
         this.emailAddress = emailAddress;
@@ -49,18 +69,25 @@ public class UserEntity implements UserDetails {
         this.country = country;
         this.paymentMethods = paymentMethods;
         this.lastOrders = lastOrders;
-        this.role = role;
+        this.user_role = role;
     }
 
+    // Construtor via DTO
     public UserEntity(UserCreateDto userCreateDto) {
-        // Mapeie os outros campos do seu DTO aqui, por exemplo:
-        // this.name = userCreateDto.name();
-        // this.emailAddress = userCreateDto.emailAdress();
-        // this.password = userCreateDto.password(); // Lembre-se de encodar a senha no service depois!
-
-        // Define que todo mundo nasce como USER
-        this.role = UserRole.USER;
+        this.name = userCreateDto.name();
+        this.emailAddress = userCreateDto.emailAdress(); // Mantido o mapeamento do seu DTO
+        this.password = userCreateDto.password();
+        this.phoneNumber = userCreateDto.phoneNumber();
+        this.address = userCreateDto.adress();           // Mantido o mapeamento do seu DTO
+        this.zipCode = userCreateDto.zipCode();
+        this.city = userCreateDto.City();
+        this.country = userCreateDto.Country();
+        this.user_role = UserRole.USER;
+        this.paymentMethods = new ArrayList<>();
+        this.lastOrders = new ArrayList<>();
     }
+
+    // --- GETTERS E SETTERS (Mantidos idênticos para não quebrar seu código externo) ---
 
     public Integer getId() {
         return id;
@@ -130,45 +157,48 @@ public class UserEntity implements UserDetails {
         this.country = country;
     }
 
-    public ArrayList<String> getPaymentMethods() {
+    public List<String> getPaymentMethods() {
         return paymentMethods;
     }
 
-    public void setPaymentMethods(ArrayList<String> paymentMethods) {
+    public void setPaymentMethods(List<String> paymentMethods) {
         this.paymentMethods = paymentMethods;
     }
 
-    public ArrayList<OrderStatus> getLastOrders() {
+    public List<OrderStatusEnum> getLastOrders() {
         return lastOrders;
     }
 
-    public void setLastOrders(ArrayList<OrderStatus> lastOrders) {
+    public void setLastOrders(List<OrderStatusEnum> lastOrders) {
         this.lastOrders = lastOrders;
     }
 
-    public UserRole getRole() {
-        return role;
+    public UserRole getUser_role() {
+        return user_role;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public void setUser_role(UserRole user_role) {
+        this.user_role = user_role;
     }
+
+    // --- MÉTODOS DO USERDETAILS (SPRING SECURITY) ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == null) {
+        if (this.user_role == null) {
             return List.of(new SimpleGrantedAuthority("ROLE_USER"));
         }
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.user_role.name()));
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
 
     @Override
     public String getUsername() {
-        return emailAddress; // Retornando o email como username para o Spring Security
+        return emailAddress;
     }
 
     @Override

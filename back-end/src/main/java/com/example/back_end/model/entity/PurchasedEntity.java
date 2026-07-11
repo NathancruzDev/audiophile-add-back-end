@@ -1,26 +1,36 @@
 package com.example.back_end.model.entity;
 
-import com.example.back_end.model.entity.FormPayment;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "purchased")
+@Table(name = "purchased_table")
 public class PurchasedEntity {
 
     @Id
-    Integer id;
-    Integer userId;
-    String purchasedHashCode;
-    Double momentValue;
-    Date createAt;
-    FormPayment formPayment;
-    Boolean aproved;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    public PurchasedEntity(Integer id, Integer userId, String purchasedHashCode, Double momentValue, Date createAt, FormPayment formPayment,Boolean aproved) {
+    @Column(unique = true)
+    private Integer userId;
+
+    private String purchasedHashCode;
+
+    private Double momentValue;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_data")
+    private Date createAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "form_payment")
+    private FormPayment formPayment;
+
+    private Boolean aproved;
+
+
+
+    public PurchasedEntity(Integer id, Integer userId, String purchasedHashCode, Double momentValue, Date createAt, FormPayment formPayment, Boolean aproved) {
         this.id = id;
         this.userId = userId;
         this.purchasedHashCode = purchasedHashCode;
@@ -28,6 +38,9 @@ public class PurchasedEntity {
         this.createAt = createAt;
         this.formPayment = formPayment;
         this.aproved = aproved;
+    }
+
+    public PurchasedEntity() {
     }
 
     public Integer getId() {
@@ -42,7 +55,7 @@ public class PurchasedEntity {
         return userId;
     }
 
-    public void setUserIdd(Integer userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -85,5 +98,4 @@ public class PurchasedEntity {
     public void setAproved(Boolean aproved) {
         this.aproved = aproved;
     }
-
 }
