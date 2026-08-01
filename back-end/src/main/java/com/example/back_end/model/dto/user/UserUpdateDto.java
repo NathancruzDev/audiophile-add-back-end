@@ -7,9 +7,12 @@ public record UserUpdateDto(
         String name,
         String emailAdress,
         String phoneNumber,
-        String adress,
         String zipCode,
-        String City,
-        String Country
+        String street,
+        String number,
+        String complement,
+        String neighborhood,
+        String city,
+        String state
 ) {
 }

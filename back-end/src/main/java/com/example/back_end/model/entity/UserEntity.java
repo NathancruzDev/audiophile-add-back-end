@@ -2,6 +2,7 @@ package com.example.back_end.model.entity;
 
 import com.example.back_end.model.dto.user.UserCreateDto;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,10 +27,14 @@ public class UserEntity implements UserDetails {
     private String password;
     private String phoneNumber;
 
-    private String address;
+    // --- CAMPOS DE ENDEREÇO MAPEADOS PARA O VIACEP ---
     private String zipCode;
+    private String street;
+    private String number;
+    private String complement;
+    private String neighborhood;
     private String city;
-    private String country;
+    private String state;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
@@ -53,41 +58,47 @@ public class UserEntity implements UserDetails {
     private UserRole user_role;
 
 
-    public UserEntity() {
+    public UserEntity(@Valid UserCreateDto userCreateDto) {
     }
 
-    // Construtor completo
-    public UserEntity(Integer id, String name, String emailAddress, String phoneNumber, String address, String password, String zipCode, String city, String country, List<String> paymentMethods, List<OrderStatusEnum> lastOrders, UserRole role) {
+    public UserEntity(Integer id, String name, String emailAddress, String password, String phoneNumber, String zipCode, String street, String number, String complement, String neighborhood, String city, String state, List<String> paymentMethods, List<OrderStatusEnum> lastOrders, UserRole user_role) {
         this.id = id;
         this.name = name;
         this.emailAddress = emailAddress;
         this.password = password;
         this.phoneNumber = phoneNumber;
-        this.address = address;
         this.zipCode = zipCode;
+        this.street = street;
+        this.number = number;
+        this.complement = complement;
+        this.neighborhood = neighborhood;
         this.city = city;
-        this.country = country;
+        this.state = state;
         this.paymentMethods = paymentMethods;
         this.lastOrders = lastOrders;
-        this.user_role = role;
+        this.user_role = user_role;
     }
 
-    // Construtor via DTO
-    public UserEntity(UserCreateDto userCreateDto) {
-        this.name = userCreateDto.name();
-        this.emailAddress = userCreateDto.emailAdress(); // Mantido o mapeamento do seu DTO
-        this.password = userCreateDto.password();
-        this.phoneNumber = userCreateDto.phoneNumber();
-        this.address = userCreateDto.adress();           // Mantido o mapeamento do seu DTO
-        this.zipCode = userCreateDto.zipCode();
-        this.city = userCreateDto.City();
-        this.country = userCreateDto.Country();
-        this.user_role = UserRole.USER;
-        this.paymentMethods = new ArrayList<>();
-        this.lastOrders = new ArrayList<>();
+    public UserEntity(String name, String emailAddress, String password, String zipCode, String street, String number, String complement, String neighborhood, String city, String state) {
+        this.name = name;
+        this.emailAddress = emailAddress;
+        this.password = password;
+        this.zipCode = zipCode;
+        this.street = street;
+        this.number = number;
+        this.complement = complement;
+        this.neighborhood = neighborhood;
+        this.city = city;
+        this.state = state;
     }
 
-    // --- GETTERS E SETTERS (Mantidos idênticos para não quebrar seu código externo) ---
+    public UserEntity(@Valid List<UserCreateDto> userCreateDto) {
+    }
+
+    public UserEntity() {
+
+    }
+
 
     public Integer getId() {
         return id;
@@ -125,20 +136,44 @@ public class UserEntity implements UserDetails {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getZipCode() {
         return zipCode;
     }
 
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getComplement() {
+        return complement;
+    }
+
+    public void setComplement(String complement) {
+        this.complement = complement;
+    }
+
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
     }
 
     public String getCity() {
@@ -149,12 +184,12 @@ public class UserEntity implements UserDetails {
         this.city = city;
     }
 
-    public String getCountry() {
-        return country;
+    public String getState() {
+        return state;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public void setState(String state) {
+        this.state = state;
     }
 
     public List<String> getPaymentMethods() {
@@ -181,7 +216,6 @@ public class UserEntity implements UserDetails {
         this.user_role = user_role;
     }
 
-    // --- MÉTODOS DO USERDETAILS (SPRING SECURITY) ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

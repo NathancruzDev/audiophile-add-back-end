@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ public class UserService {
     private AuthenticationManager authenticationManager;
     private TokenConfig tokenConfig;
     private ProductRepository productRepository;
-
+    private PasswordEncoder passwordEncoder;
     private PurchasedService purchasedService;
 
     public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PurchasedService purchasedService) {
@@ -35,14 +37,34 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<UserCreateDto> createUser(@Valid UserCreateDto userCreateDto){
-        if(userRepository.existsByEmailAddress(userCreateDto.emailAdress())){
-            throw new RuntimeException("The user_id have exist");
+    public UserCreateDto createUser(@Valid UserCreateDto userCreateDto) {
+        if (userRepository.existsByEmailAddress(userCreateDto.emailAdress())) {
+            throw new RuntimeException("Email já cadastrado");
         }
-        UserEntity userEntity=new UserEntity(userCreateDto);
+        UserEntity userEntity = new UserEntity(userCreateDto);
         userRepository.save(userEntity);
-        System.out.println("Usuario criado" + userCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userCreateDto);
+        return userCreateDto;
+    }
+
+    @Transactional
+    public List<UserEntity> createManyUsers(List<@Valid UserCreateDto> userCreateDtos) {
+        List<UserEntity> userEntitiesList = userCreateDtos.stream()
+                .map(dto -> {
+                    UserEntity user = new UserEntity();
+                    user.setName(dto.name());
+                    user.setEmailAddress(dto.emailAdress());
+                    user.setPassword(passwordEncoder.encode(dto.password()));
+                    user.setPhoneNumber(dto.phoneNumber());
+                    user.setZipCode(dto.zipCode());
+                    user.setStreet(dto.street());
+                    user.setNeighborhood(dto.neighborhood());
+                    user.setCity(dto.city());
+                    user.setState(dto.state());
+                    return user;
+                })
+                .collect(Collectors.toList());
+
+        return userRepository.saveAll(userEntitiesList);
     }
 
     public List<GetUsersDto> getAllUsers(){
@@ -75,11 +97,13 @@ public class UserService {
 
         userEntity.setName(userUpdateDto.name());
         userEntity.setPhoneNumber(userUpdateDto.phoneNumber());
-        userEntity.setAddress(userUpdateDto.adress());
         userEntity.setZipCode(userUpdateDto.zipCode());
-        userEntity.setCity(userUpdateDto.City());
-        userEntity.setCountry(userUpdateDto.Country());
-
+        userEntity.setStreet(userUpdateDto.street());
+        userEntity.setNumber(userUpdateDto.number());
+        userEntity.setComplement(userUpdateDto.complement());
+        userEntity.setNeighborhood(userUpdateDto.neighborhood());
+        userEntity.setCity(userUpdateDto.city());
+        userEntity.setState(userUpdateDto.state());
         userRepository.save(userEntity);
     }
 
@@ -97,3 +121,4 @@ public class UserService {
     }
 
 }
+

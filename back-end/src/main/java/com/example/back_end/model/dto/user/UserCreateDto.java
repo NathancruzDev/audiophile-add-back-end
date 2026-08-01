@@ -10,9 +10,12 @@ public record UserCreateDto(
         @NotNull
         String password,
         String phoneNumber,
-        String adress,
         String zipCode,
-        String City,
-        String Country
+        String street,
+        String number,
+        String complement,
+        String neighborhood,
+        String city,
+        String state
 ){
 }
