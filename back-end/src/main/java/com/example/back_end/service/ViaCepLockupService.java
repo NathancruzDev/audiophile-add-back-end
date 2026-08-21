@@ -14,7 +14,18 @@ public class ViaCepLockupService implements AdressLockupClient {
     }
     @Override
     public Optional<ViaCepDto> findAdressByCep(String cep) {
-        return Optional.empty();
+        String formateCep=cep.replaceAll("\\D","");
+            if(formateCep.length() !=8){
+                return Optional.empty();
+            }
+            try{
+                ViaCepDto viaCepDto=restClient.get().uri(url,formateCep).retrieve()
+                        .body(ViaCepDto.class);
+                if(viaCepDto != null && Boolean.TRUE.equals(viaCepDto.erro())) return Optional.empty();
+                return Optional.ofNullable(viaCepDto);
+            }catch(Exception e){
+                return Optional.empty();
+            }
     }
 
 }
