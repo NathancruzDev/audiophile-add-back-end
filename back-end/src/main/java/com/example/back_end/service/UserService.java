@@ -4,6 +4,7 @@ import com.example.back_end.config.security.TokenConfig;
 import com.example.back_end.model.dto.OrderPendingDto;
 import com.example.back_end.model.dto.user.*;
 import com.example.back_end.model.entity.UserEntity;
+import com.example.back_end.repository.AdressLockupClient;
 import com.example.back_end.repository.ProductRepository;
 import com.example.back_end.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -27,13 +28,17 @@ public class UserService {
     private ProductRepository productRepository;
     private PasswordEncoder passwordEncoder;
     private PurchasedService purchasedService;
+    private ViaCepLockupService viaCepLockupService;
+    private final AdressLockupClient adressLockupClient;
 
-    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PurchasedService purchasedService) {
+    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PurchasedService purchasedService, ViaCepLockupService viaCepLockupService, AdressLockupClient adressLockupClient) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.tokenConfig = tokenConfig;
         this.productRepository = productRepository;
         this.purchasedService = purchasedService;
+        this.viaCepLockupService = viaCepLockupService;
+        this.adressLockupClient = adressLockupClient;
     }
 
     @Transactional
@@ -41,7 +46,8 @@ public class UserService {
         if (userRepository.existsByEmailAddress(userCreateDto.emailAdress())) {
             throw new RuntimeException("Email já cadastrado");
         }
-        UserEntity userEntity = new UserEntity(userCreateDto);
+        ViaCepDto viaCepDto = adressLockupClient.findAdressByCep(userCreateDto.zipCode()).orElseThrow(()->new IllegalArgumentException("Adress general error."));
+        UserEntity userEntity = new UserEntity(userCreateDto,viaCepDto);
         userRepository.save(userEntity);
         return userCreateDto;
     }
@@ -95,15 +101,19 @@ public class UserService {
                 throw new RuntimeException("");
             }
 
+        ViaCepDto viaCepDto=adressLockupClient.findAdressByCep(userUpdateDto.zipCode()).orElseThrow(()-> new RuntimeException("Adress general error."));
+
         userEntity.setName(userUpdateDto.name());
         userEntity.setPhoneNumber(userUpdateDto.phoneNumber());
-        userEntity.setZipCode(userUpdateDto.zipCode());
-        userEntity.setStreet(userUpdateDto.street());
+
+        userEntity.setZipCode(viaCepDto.cep());
+        userEntity.setStreet(viaCepDto.logradouro());
         userEntity.setNumber(userUpdateDto.number());
         userEntity.setComplement(userUpdateDto.complement());
-        userEntity.setNeighborhood(userUpdateDto.neighborhood());
-        userEntity.setCity(userUpdateDto.city());
-        userEntity.setState(userUpdateDto.state());
+        userEntity.setNeighborhood(viaCepDto.bairro());
+        userEntity.setCity(viaCepDto.localidade());
+        userEntity.setState(viaCepDto.uf());
+
         userRepository.save(userEntity);
     }
 

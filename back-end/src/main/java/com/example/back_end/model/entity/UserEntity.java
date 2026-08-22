@@ -1,6 +1,7 @@
 package com.example.back_end.model.entity;
 
 import com.example.back_end.model.dto.user.UserCreateDto;
+import com.example.back_end.model.dto.user.ViaCepDto;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,7 +28,7 @@ public class UserEntity implements UserDetails {
     private String password;
     private String phoneNumber;
 
-    // --- CAMPOS DE ENDEREÇO MAPEADOS PARA O VIACEP ---
+    // --- CAMPOS DE ENDEREÇO PARA O VIACEP ---
     private String zipCode;
     private String street;
     private String number;
@@ -92,11 +93,26 @@ public class UserEntity implements UserDetails {
         this.state = state;
     }
 
+
     public UserEntity(@Valid List<UserCreateDto> userCreateDto) {
     }
 
     public UserEntity() {
 
+    }
+
+    public UserEntity(@Valid UserCreateDto userCreateDto, ViaCepDto viaCepDto) {
+        this.name=userCreateDto.name();
+        this.emailAddress=userCreateDto.emailAdress();
+        this.password=userCreateDto.password();
+        this.phoneNumber=userCreateDto.phoneNumber();
+        this.zipCode=viaCepDto.cep();
+        this.street=viaCepDto.logradouro();
+        this.number=userCreateDto.number();
+        this.complement=userCreateDto.complement();
+        this.neighborhood= viaCepDto.bairro();
+        this.city= viaCepDto.localidade();
+        this.state=viaCepDto.uf();
     }
 
 
