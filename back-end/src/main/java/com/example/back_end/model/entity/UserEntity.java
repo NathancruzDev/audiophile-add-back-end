@@ -28,7 +28,6 @@ public class UserEntity implements UserDetails {
     private String password;
     private String phoneNumber;
 
-    // --- CAMPOS DE ENDEREÇO PARA O VIACEP ---
     private String zipCode;
     private String street;
     private String number;
@@ -118,10 +117,6 @@ public class UserEntity implements UserDetails {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -9,15 +9,19 @@ import com.example.back_end.repository.ProductRepository;
 import com.example.back_end.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,6 +88,31 @@ public class UserService {
         ).collect(Collectors.toList());
     }
 
+    public UserDto getUserById(Integer id){
+            Optional<UserEntity> userEntity=userRepository.findById(id);
+                if(userEntity.isPresent()){
+                    UserDto user=new UserDto(
+                            userEntity.get().getId(),
+                            userEntity.get().getName(),
+                            userEntity.get().getEmailAddress(),
+                            userEntity.get().getPhoneNumber(),
+                            userEntity.get().getZipCode(),
+                            userEntity.get().getStreet(),
+                            userEntity.get().getNumber(),
+                            userEntity.get().getComplement(),
+                            userEntity.get().getNeighborhood(),
+                            userEntity.get().getCity(),
+                            userEntity.get().getState(),
+                            userEntity.get().getPaymentMethods(),
+                            userEntity.get().getLastOrders()
+                    );
+                    return user;
+                }
+                else{
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                }
+    }
+
     @Transactional
     public ResponseEntity<UserLoginDto> login(UserLoginDto userLogin) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(userLogin.emailAdress(), userLogin.password());
@@ -97,9 +126,32 @@ public class UserService {
     public void updateUser(UserUpdateDto userUpdateDto){
         UserEntity userEntity=userRepository.findByEmailAddress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
             if(!userEntity.getEmailAddress().equals(userUpdateDto.emailAdress())){
-                //troca de email tem que ser tratada mais séria.
                 throw new RuntimeException("");
             }
+
+        ViaCepDto viaCepDto=adressLockupClient.findAdressByCep(userUpdateDto.zipCode()).orElseThrow(()-> new RuntimeException("Adress general error."));
+
+        userEntity.setName(userUpdateDto.name());
+        userEntity.setPhoneNumber(userUpdateDto.phoneNumber());
+
+        userEntity.setZipCode(viaCepDto.cep());
+        userEntity.setStreet(viaCepDto.logradouro());
+        userEntity.setNumber(userUpdateDto.number());
+        userEntity.setComplement(userUpdateDto.complement());
+        userEntity.setNeighborhood(viaCepDto.bairro());
+        userEntity.setCity(viaCepDto.localidade());
+        userEntity.setState(viaCepDto.uf());
+
+        userRepository.save(userEntity);
+    }
+
+    @Transactional
+    public void updateUserById(Integer id, @NonNull UserUpdateDto userUpdateDto){
+        UserEntity userEntity=userRepository.findByEmailAddress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
+
+        if(!userEntity.getEmailAddress().equals(userUpdateDto.emailAdress())){
+            throw new RuntimeException("");
+        }
 
         ViaCepDto viaCepDto=adressLockupClient.findAdressByCep(userUpdateDto.zipCode()).orElseThrow(()-> new RuntimeException("Adress general error."));
 
@@ -128,6 +180,22 @@ public class UserService {
     public ResponseEntity<List<OrderPendingDto>> getMyUserRequests(UserEntity loggedUser){
         List<OrderPendingDto> list = purchasedService.listAllByUser(loggedUser.getId());
         return ResponseEntity.ok().body(list);
+    }
+
+    @Transactional
+    public void updateUserRole(String id,String newRole){
+            //  FAZER NATHAN (1) DO BLOCO DE NOTAS
+    }
+
+
+    public Boolean isUserLogged(){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null && authentication.isAuthenticated()){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 }
