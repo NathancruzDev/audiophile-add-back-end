@@ -4,6 +4,7 @@ import com.example.back_end.config.security.TokenConfig;
 import com.example.back_end.model.dto.OrderPendingDto;
 import com.example.back_end.model.dto.user.*;
 import com.example.back_end.model.entity.UserEntity;
+import com.example.back_end.model.entity.UserRole;
 import com.example.back_end.repository.AdressLockupClient;
 import com.example.back_end.repository.ProductRepository;
 import com.example.back_end.repository.UserRepository;
@@ -184,7 +185,10 @@ public class UserService {
 
     @Transactional
     public void updateUserRole(String id,String newRole){
-            //  FAZER NATHAN (1) DO BLOCO DE NOTAS
+        UserEntity userEntity=userRepository.findById(Integer.valueOf(id)).orElseThrow(()-> new RuntimeException("User not exist"));
+        userEntity.setUser_role(UserRole.valueOf(newRole));
+
+        userRepository.save(userEntity);
     }
 
 
