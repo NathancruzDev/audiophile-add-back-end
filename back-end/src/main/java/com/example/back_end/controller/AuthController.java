@@ -54,6 +54,6 @@ public class AuthController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/my-requests")
     public ResponseEntity<List<OrderPendingDto>> getMyRequests(@AuthenticationPrincipal UserEntity loggedUser) {
-        return ResponseEntity.ok(userService.getMyUserRequests(loggedUser));
+        return ResponseEntity.ok(userService.getMyUserRequests(loggedUser).getBody());
     }
 }

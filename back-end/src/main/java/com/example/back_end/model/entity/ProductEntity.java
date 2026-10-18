@@ -7,7 +7,9 @@ import jakarta.persistence.*;
 public class ProductEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
+
     String name;
     Double price;
     Integer stock;
@@ -24,6 +26,9 @@ public class ProductEntity {
     }
 
     public ProductEntity(String name, Double price, Integer stock) {
+        this.name=name;
+        this.price=price;
+        this.stock=stock;
     }
 
     public Integer getId() {

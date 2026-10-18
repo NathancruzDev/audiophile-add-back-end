@@ -36,6 +36,7 @@ public class UserEntity implements UserDetails {
     private String city;
     private String state;
 
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "user_payment_methods",

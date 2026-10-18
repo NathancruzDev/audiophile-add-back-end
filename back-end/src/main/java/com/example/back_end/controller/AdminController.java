@@ -31,23 +31,23 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
+    @GetMapping("/get-all-users")
     public ResponseEntity<List<GetUsersDto>> getAllUsers(Pageable pageable) {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/findUser/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/updateUserAdmin/{id}")
     public ResponseEntity<Void> updateUserAdmin(@PathVariable Integer id, @Valid @RequestBody UserUpdateDto updateDto) {
         userService.updateUserById(id, updateDto);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/roles")
+    @PatchMapping("/updateRole/{id}/roles")
     public ResponseEntity<Void> updateUserRole(@PathVariable Integer id, @RequestParam String newRole) {
         userService.updateUserRole(String.valueOf(id), newRole);
         return ResponseEntity.noContent().build();

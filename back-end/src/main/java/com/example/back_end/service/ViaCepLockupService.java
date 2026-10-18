@@ -2,10 +2,12 @@ package com.example.back_end.service;
 
 import com.example.back_end.model.dto.user.ViaCepDto;
 import com.example.back_end.repository.AdressLockupClient;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.Optional;
 
+@Service
 public class ViaCepLockupService implements AdressLockupClient {
     private final RestClient restClient;
     private String url="https://viacep.com.br/ws/{cep}/json/";

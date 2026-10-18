@@ -36,11 +36,12 @@ public class UserService {
     private ViaCepLockupService viaCepLockupService;
     private final AdressLockupClient adressLockupClient;
 
-    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PurchasedService purchasedService, ViaCepLockupService viaCepLockupService, AdressLockupClient adressLockupClient) {
+    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PasswordEncoder passwordEncoder, PurchasedService purchasedService, ViaCepLockupService viaCepLockupService, AdressLockupClient adressLockupClient) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.tokenConfig = tokenConfig;
         this.productRepository = productRepository;
+        this.passwordEncoder = passwordEncoder;
         this.purchasedService = purchasedService;
         this.viaCepLockupService = viaCepLockupService;
         this.adressLockupClient = adressLockupClient;
@@ -52,7 +53,9 @@ public class UserService {
             throw new RuntimeException("Email já cadastrado");
         }
         ViaCepDto viaCepDto = adressLockupClient.findAdressByCep(userCreateDto.zipCode()).orElseThrow(()->new IllegalArgumentException("Adress general error."));
+        String encryptedPassword = passwordEncoder.encode(userCreateDto.password());
         UserEntity userEntity = new UserEntity(userCreateDto,viaCepDto);
+        userEntity.setPassword(encryptedPassword);
         userRepository.save(userEntity);
         return userCreateDto;
     }
