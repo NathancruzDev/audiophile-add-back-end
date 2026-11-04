@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Ana Silva",
+    "emailAdress": "ana.silva@email.com",
+    "password": "SenhaSegura123!",
+    "phoneNumber": "+5521988887777",
+    "zipCode": "28625-000",
+    "street": "Avenida Central",
+    "number": "100",
+    "complement": "Apt 201",
+    "neighborhood": "Centro",
+    "city": "Nova Friburgo",
+    "state": "RJ"
+  },
+  {
+    "name": "Mariana Costa",
+    "emailAdress": "mariana.costa@email.com",
+    "password": "MinhaSenha789*",
+    "phoneNumber": "+5521977775555",
+    "zipCode": "28630-456",
+    "street": "Praça do Suspiro",
+    "number": "12",
+    "complement": "Bloco B",
+    "neighborhood": "Bonsucesso",
+    "city": "Nova Friburgo",
+    "state": "RJ"
+  },
+  {
+    "name": "Lucas Oliveira",
+    "emailAdress": "lucas.oliveira@email.com",
+    "password": "LucasPass2026@",
+    "phoneNumber": "+5521966664444",
+    "zipCode": "28613-789",
+    "street": "Rua Principal",
+    "number": "300",
+    "complement": "",
+    "neighborhood": "Conselheiro Paulino",
+    "city": "Nova Friburgo",
+    "state": "RJ"
+  },
+  {
+    "name": "Beatriz Lima",
+    "emailAdress": "beatriz.lima@email.com",
+    "password": "BeaSecure999$",
+    "phoneNumber": "+5521955553333",
+    "zipCode": "28620-111",
+    "street": "Estrada dos Tamoios",
+    "number": "1500",
+    "complement": "Lote 5",
+    "neighborhood": "Cônego",
+    "city": "Nova Friburgo",
+    "state": "RJ"
+  }
+]

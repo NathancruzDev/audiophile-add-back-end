@@ -1,12 +1,11 @@
 package com.example.back_end.service;
 
-import com.example.back_end.model.dto.product.ProductDto;
 import com.example.back_end.model.entity.CartEntity;
+import com.example.back_end.model.entity.CartItemEntity;
 import com.example.back_end.model.entity.ProductEntity;
 import com.example.back_end.model.entity.UserEntity;
 import com.example.back_end.repository.CartRepository;
 import com.example.back_end.repository.ProductRepository;
-import com.stripe.model.tax.Registration;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +32,11 @@ public class CartService {
                     return cartRepository.save(newCart);
                 });
 
-        cart.getItems().add(product);
+        CartItemEntity cartItem = new CartItemEntity();
+        cartItem.setCart(cart);
+        cartItem.setProduct(product);
+        cartItem.setQuantity(1);
+        cart.getItems().add(cartItem);
         return cartRepository.save(cart);
     }
-
-
 }
