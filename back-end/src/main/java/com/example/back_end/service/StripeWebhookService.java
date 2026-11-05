@@ -10,31 +10,30 @@ import com.stripe.net.Webhook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
-
 @Service
 public class StripeWebhookService {
-    OrderPendingRepository orderPendingRepository;
-    PaymentRepository paymentRepository;
-    PurchasedService purchasedService;
+    private final OrderPendingRepository orderPendingRepository;
+    private final PaymentRepository paymentRepository;
+    private final PurchasedService purchasedService;
 
     @Value("${stripe.webhook.secret}")
     private String webhookSecret;
 
-    public StripeWebhookService(OrderPendingRepository orderPendingRepository, PaymentRepository paymentRepository) {
+       public StripeWebhookService(OrderPendingRepository orderPendingRepository,
+                                PaymentRepository paymentRepository,
+                                PurchasedService purchasedService) {
         this.orderPendingRepository = orderPendingRepository;
         this.paymentRepository = paymentRepository;
+        this.purchasedService = purchasedService;
     }
 
     public void handleWebhook(String payload, String sigHeader){
         Event event;
-
-            try{
-                event= Webhook.constructEvent(payload,sigHeader,webhookSecret);
-            }catch (Exception e){
-                throw new RuntimeException("Invalid webhook signature from stripe api");
-            }
-        String eventType=event.getType();
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid webhook signature from stripe api", e);
+        }
 
         switch (event.getType()) {
             case "payment_intent.succeeded" -> handlePaymentSucceeded(event);
@@ -42,7 +41,6 @@ public class StripeWebhookService {
             case "payment_intent.canceled" -> handlePaymentCanceled(event);
             default -> { }
         }
-
     }
 
     private void handlePaymentSucceeded(Event event) {

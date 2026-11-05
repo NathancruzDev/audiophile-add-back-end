@@ -116,7 +116,7 @@ public class UserEntity implements UserDetails {
     }
 
 
-    public Integer getId() {
+    public static Integer getId() {
         return id;
     }
 

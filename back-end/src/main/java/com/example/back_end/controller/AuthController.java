@@ -48,12 +48,13 @@ public class AuthController {
     // Autenticação de usuário
     @PostMapping("/login")
     public ResponseEntity<UserLoginDto> login(@Valid @RequestBody UserLoginDto userLoginDto) {
-        return userService.login(userLoginDto);
+        UserLoginDto user=userService.login(userLoginDto);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/my-requests")
     public ResponseEntity<List<OrderPendingDto>> getMyRequests(@AuthenticationPrincipal UserEntity loggedUser) {
-        return ResponseEntity.ok(userService.getMyUserRequests(loggedUser).getBody());
+        return ResponseEntity.ok(userService.getMyUserRequests(loggedUser));
     }
 }

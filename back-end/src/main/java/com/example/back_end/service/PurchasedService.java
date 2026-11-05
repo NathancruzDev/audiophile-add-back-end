@@ -50,12 +50,12 @@ public class PurchasedService {
     @Transactional
     public CheckoutResponseDto checkout(
             List<ProductPurchasedDto> productsInCart,
-             GetUsersDto userDto,
+             UserEntity userEntity,
             FormPayment formPayment
     ) {
         List<ProductPurchasedDto> expandedCart = validateAndExpandCart(productsInCart);
 
-        UserEntity user = userRepository.findById(userDto.id())
+        UserEntity user = userRepository.findById(UserEntity.getId())
                 .orElseThrow(() -> new RuntimeException("This user does not exist."));
 
         String orderHash = String.valueOf(orderHashCodeService.codeGeneration());

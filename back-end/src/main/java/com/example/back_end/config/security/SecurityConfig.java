@@ -33,13 +33,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/users/getRequests").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/create-user").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/getAllUsers").hasRole("ADMIN")
+                        .requestMatchers("/api/webhook/**").permitAll()
+
                         .requestMatchers("/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest().authenticated()
-                )
-                .build();
+                ).build();
     }
 
     @Bean

@@ -6,13 +6,11 @@ import com.example.back_end.model.dto.user.*;
 import com.example.back_end.model.entity.UserEntity;
 import com.example.back_end.model.entity.UserRole;
 import com.example.back_end.repository.AdressLockupClient;
-import com.example.back_end.repository.ProductRepository;
 import com.example.back_end.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,23 +25,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private UserRepository userRepository;
-    private AuthenticationManager authenticationManager;
-    private TokenConfig tokenConfig;
-    private ProductRepository productRepository;
-    private PasswordEncoder passwordEncoder;
-    private PurchasedService purchasedService;
-    private ViaCepLockupService viaCepLockupService;
+    private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final TokenConfig tokenConfig;
+    private final PasswordEncoder passwordEncoder;
+    private final PurchasedService purchasedService;
     private final AdressLockupClient adressLockupClient;
 
-    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, ProductRepository productRepository, PasswordEncoder passwordEncoder, PurchasedService purchasedService, ViaCepLockupService viaCepLockupService, AdressLockupClient adressLockupClient) {
+    public UserService(UserRepository userRepository, AuthenticationManager authenticationManager, TokenConfig tokenConfig, PasswordEncoder passwordEncoder, PurchasedService purchasedService, AdressLockupClient adressLockupClient) {
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
         this.tokenConfig = tokenConfig;
-        this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
         this.purchasedService = purchasedService;
-        this.viaCepLockupService = viaCepLockupService;
         this.adressLockupClient = adressLockupClient;
     }
 
@@ -52,9 +46,11 @@ public class UserService {
         if (userRepository.existsByEmailAddress(userCreateDto.emailAdress())) {
             throw new RuntimeException("Email já cadastrado");
         }
-        ViaCepDto viaCepDto = adressLockupClient.findAdressByCep(userCreateDto.zipCode()).orElseThrow(()->new IllegalArgumentException("Adress general error."));
+        ViaCepDto viaCepDto = adressLockupClient.findAdressByCep(userCreateDto.zipCode())
+                .orElseThrow(() -> new IllegalArgumentException("Address general error."));
+
         String encryptedPassword = passwordEncoder.encode(userCreateDto.password());
-        UserEntity userEntity = new UserEntity(userCreateDto,viaCepDto);
+        UserEntity userEntity = new UserEntity(userCreateDto, viaCepDto);
         userEntity.setPassword(encryptedPassword);
         userRepository.save(userEntity);
         return userCreateDto;
@@ -93,51 +89,44 @@ public class UserService {
     }
 
     public UserDto getUserById(Integer id){
-            Optional<UserEntity> userEntity=userRepository.findById(id);
-                if(userEntity.isPresent()){
-                    UserDto user=new UserDto(
-                            userEntity.get().getId(),
-                            userEntity.get().getName(),
-                            userEntity.get().getEmailAddress(),
-                            userEntity.get().getPhoneNumber(),
-                            userEntity.get().getZipCode(),
-                            userEntity.get().getStreet(),
-                            userEntity.get().getNumber(),
-                            userEntity.get().getComplement(),
-                            userEntity.get().getNeighborhood(),
-                            userEntity.get().getCity(),
-                            userEntity.get().getState(),
-                            userEntity.get().getPaymentMethods(),
-                            userEntity.get().getLastOrders()
-                    );
-                    return user;
-                }
-                else{
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-                }
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return new UserDto(
+                userEntity.getId(),
+                userEntity.getName(),
+                userEntity.getEmailAddress(),
+                userEntity.getPhoneNumber(),
+                userEntity.getZipCode(),
+                userEntity.getStreet(),
+                userEntity.getNumber(),
+                userEntity.getComplement(),
+                userEntity.getNeighborhood(),
+                userEntity.getCity(),
+                userEntity.getState(),
+                userEntity.getPaymentMethods(),
+                userEntity.getLastOrders()
+        );
     }
 
-    @Transactional
-    public ResponseEntity<UserLoginDto> login(UserLoginDto userLogin) {
+    public UserLoginDto login(UserLoginDto userLogin) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(userLogin.emailAdress(), userLogin.password());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         UserEntity user = (UserEntity) authentication.getPrincipal();
         String tokenJWT = tokenConfig.generateToken(user);
-        return ResponseEntity.ok(new UserLoginDto(user.getEmailAddress(), tokenJWT));
+        return new UserLoginDto(user.getEmailAddress(), tokenJWT);
     }
 
     @Transactional
     public void updateUser(UserUpdateDto userUpdateDto){
-        UserEntity userEntity=userRepository.findByEmailAddress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
-            if(!userEntity.getEmailAddress().equals(userUpdateDto.emailAdress())){
-                throw new RuntimeException("");
-            }
+        UserEntity userEntity = userRepository.findByEmailAddress(userUpdateDto.emailAdress())
+                .orElseThrow(() -> new RuntimeException("This user doesn't exist."));
 
-        ViaCepDto viaCepDto=adressLockupClient.findAdressByCep(userUpdateDto.zipCode()).orElseThrow(()-> new RuntimeException("Adress general error."));
+        ViaCepDto viaCepDto = adressLockupClient.findAdressByCep(userUpdateDto.zipCode())
+                .orElseThrow(() -> new RuntimeException("Address general error."));
 
         userEntity.setName(userUpdateDto.name());
         userEntity.setPhoneNumber(userUpdateDto.phoneNumber());
-
         userEntity.setZipCode(viaCepDto.cep());
         userEntity.setStreet(viaCepDto.logradouro());
         userEntity.setNumber(userUpdateDto.number());
@@ -151,17 +140,14 @@ public class UserService {
 
     @Transactional
     public void updateUserById(Integer id, @NonNull UserUpdateDto userUpdateDto){
-        UserEntity userEntity=userRepository.findByEmailAddress(userUpdateDto.emailAdress()).orElseThrow(() -> new RuntimeException("This user don't exists."));
+        UserEntity userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("This user doesn't exist."));
 
-        if(!userEntity.getEmailAddress().equals(userUpdateDto.emailAdress())){
-            throw new RuntimeException("");
-        }
-
-        ViaCepDto viaCepDto=adressLockupClient.findAdressByCep(userUpdateDto.zipCode()).orElseThrow(()-> new RuntimeException("Adress general error."));
+        ViaCepDto viaCepDto = adressLockupClient.findAdressByCep(userUpdateDto.zipCode())
+                .orElseThrow(() -> new RuntimeException("Address general error."));
 
         userEntity.setName(userUpdateDto.name());
         userEntity.setPhoneNumber(userUpdateDto.phoneNumber());
-
         userEntity.setZipCode(viaCepDto.cep());
         userEntity.setStreet(viaCepDto.logradouro());
         userEntity.setNumber(userUpdateDto.number());
@@ -173,37 +159,26 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    @Transactional
-    public ResponseEntity<List<OrderPendingDto>> getUserRequests(UserDto userDto){
-        UserEntity userEntity=userRepository.findById(userDto.id()).orElseThrow(()-> new RuntimeException("This user dont exists."));
-        List<OrderPendingDto> list=purchasedService.listAllByUser(userDto.id());
-        return ResponseEntity.ok().body(list);
+    public List<OrderPendingDto> getUserRequests(Integer userId){
+        userRepository.findById(userId).orElseThrow(() -> new RuntimeException("This user doesn't exist."));
+        return purchasedService.listAllByUser(userId);
+    }
+
+    public List<OrderPendingDto> getMyUserRequests(UserEntity loggedUser){
+        return purchasedService.listAllByUser(loggedUser.getId());
     }
 
     @Transactional
-    public ResponseEntity<List<OrderPendingDto>> getMyUserRequests(UserEntity loggedUser){
-        List<OrderPendingDto> list = purchasedService.listAllByUser(loggedUser.getId());
-        return ResponseEntity.ok().body(list);
-    }
-
-    @Transactional
-    public void updateUserRole(String id,String newRole){
-        UserEntity userEntity=userRepository.findById(Integer.valueOf(id)).orElseThrow(()-> new RuntimeException("User not exist"));
+    public void updateUserRole(String id, String newRole){
+        UserEntity userEntity = userRepository.findById(Integer.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("User not exist"));
         userEntity.setUser_role(UserRole.valueOf(newRole));
-
         userRepository.save(userEntity);
     }
 
-
     public Boolean isUserLogged(){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && authentication.isAuthenticated()){
-            return true;
-        }
-        else{
-            return false;
-        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && authentication.isAuthenticated() &&
+                !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"));
     }
-
 }
-
